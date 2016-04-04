@@ -1,8 +1,9 @@
-import requests  
+
 import time  # time.sleep
 import sys # sys.stdout.flush
 
 import getpass
+import requests
 
 import smtplib
 from email.mime.text import MIMEText
@@ -34,21 +35,29 @@ def loop_watcher(url):
             notice = 'Site updated: '
             notice += new_req_mod_date
             print(notice)
-            
-            email_notice(notice, login, psswd)
+            msg = create_email_msg(email, notice)
+            email_notice(msg, login, psswd)
         else:
             sys.stdout.flush()
             time.sleep(600) # 600 seconds == 10 minutes
 
     print("Terminating watch.")
 
-def email_notice(notice, login, psswd):
+
+def create_email_msg(email, notice):
+    """ 'To' and 'From' set to 'email'
+        'Subject' and content set to 'msg'
+    """
     msg = MIMEText(notice)
 
     msg['Subject'] = notice
     msg['From'] = email
     msg['To'] = email
 
+    return msg
+    
+
+def send_email(msg, login, psswd):
     s = smtplib.SMTP('localhost')
     s.login(login, psswd)
     s.send_message(msg)
